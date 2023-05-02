@@ -2,6 +2,7 @@ import discord
 import asyncio
 import re
 import os
+import pathlib
 
 from redbot.core import commands
 
@@ -81,7 +82,7 @@ class madlib(commands.Cog):
         try:
             prompt_list = dump_dir()
 
-            file = open(prompt_list[int(args[0]) - 1]['src'], 'r')
+            file = open(pathlib.Path(prompt_list[int(args[0]) - 1]['src']), 'r')
             buffer = file.read()
             buffer = buffer.split(']', 1)
             buffer = buffer[1]
@@ -116,7 +117,7 @@ class madlib(commands.Cog):
         try:
             user_text = re.findall('\[(.*?)\]', args)
             grab_title = user_text[0].replace(' ', '_')
-            new_file = open(f"madlib/prompts/{grab_title}", "w")
+            new_file = open(pathlib.Path(f"madlib/prompts/{grab_title}"), "w")
 
             new_file.write(args)
 
@@ -130,7 +131,7 @@ class madlib(commands.Cog):
     @madlib.command(name = "delete")
     async def delete_prompt(self, ctx, *args):
         try:
-            protected_files = open("madlib/protected.txt", "r")
+            protected_files = open(pathlib.Path("madlib/protected.txt"), "r")
             protected_titles = protected_files.read()
             protected_titles = re.findall('\[(.*?)\]', protected_titles)
             all_titles = dump_dir()
@@ -221,7 +222,7 @@ def dump_dir():
         buffer = ''
         title = ''
         try:
-            file = open(src, 'r')
+            file = open(pathlib.Path(src), 'r')
             buffer = file.read()
             title = re.findall('\[(.*?)\]', buffer)
             file.close
