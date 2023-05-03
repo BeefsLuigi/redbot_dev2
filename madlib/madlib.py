@@ -218,7 +218,7 @@ def dump_dir():
 
     prompt_path = os.path.join(os.getcwd(), 'madlib', 'prompts')
 
-    print(os.getcwd())
+    print(pathlib.Path(__file__).resolve())
     print(os.listdir("."))
 
 
