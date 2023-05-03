@@ -6,6 +6,7 @@ import pathlib
 
 from redbot.core import commands
 
+
 class madlib(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -214,15 +215,18 @@ class madlib(commands.Cog):
 
 # takes all files, makes list full of their data, sends it back
 def dump_dir():
+
+    prompt_path = os.path.join(os.getcwd(), 'madlib', 'prompts')
+
     file_names = os.listdir(pathlib.Path("madlib/prompts/"))
     files = []
 
     for i in file_names:
-        src = f"madlib/prompts/{i}"
+        src = os.path.join(prompt_path, i)
         buffer = ''
         title = ''
         try:
-            file = open(pathlib.Path(src), 'r')
+            file = open(src, 'r')
             buffer = file.read()
             title = re.findall('\[(.*?)\]', buffer)
             file.close
