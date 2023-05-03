@@ -218,7 +218,7 @@ def dump_dir():
 
     prompt_path = os.path.join(os.getcwd(), 'madlib', 'prompts')
 
-    file_names = os.listdir(pathlib.Path("madlib/prompts/"))
+    file_names = os.listdir(prompt_path)
     files = []
 
     for i in file_names:
