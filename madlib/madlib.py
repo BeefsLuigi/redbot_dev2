@@ -216,11 +216,8 @@ class madlib(commands.Cog):
 # takes all files, makes list full of their data, sends it back
 def dump_dir():
 
-    prompt_path = os.path.join(os.getcwd(), 'madlib', 'prompts')
-
-    print(pathlib.Path(__file__).resolve())
-    print(os.listdir("."))
-
+    prompt_path = pathlib.Path(pathlib.Path(__file__).resolve())
+    prompt_path = str(prompt_path.parent / 'prompts')
 
     file_names = os.listdir(prompt_path)
     files = []
