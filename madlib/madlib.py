@@ -83,7 +83,7 @@ class madlib(commands.Cog):
         try:
             prompt_list = dump_dir()
 
-            file = open(pathlib.Path(prompt_list[int(args[0]) - 1]['src']), 'r')
+            file = open(prompt_list[int(args[0]) - 1]['src'], 'r')
             buffer = file.read()
             buffer = buffer.split(']', 1)
             buffer = buffer[1]
@@ -118,13 +118,16 @@ class madlib(commands.Cog):
         try:
             user_text = re.findall('\[(.*?)\]', args)
             grab_title = user_text[0].replace(' ', '_')
-            new_file = open(pathlib.Path(f"madlib/prompts/{grab_title}"), "w")
+            prompt_path = pathlib.Path(pathlib.Path(__file__).resolve())
+            prompt_path = prompt_path.parent / 'prompts' / f"{grab_title}.txt"
 
-            new_file.write(args)
+            pathlib.Path(prompt_path).write_text(args)
+
+            #new_file.write(args)
+
+
 
             await ctx.send(f"New user prompt saved: {user_text[0]}")
-
-            new_file.close()
         except:
             await ctx.send("There's been an error or user input is mangled.")
 
@@ -132,8 +135,14 @@ class madlib(commands.Cog):
     @madlib.command(name = "delete")
     async def delete_prompt(self, ctx, *args):
         try:
-            protected_files = open(pathlib.Path("madlib/protected.txt"), "r")
-            protected_titles = protected_files.read()
+            protected_files = pathlib.Path(pathlib.Path(__file__).resolve())
+            protected_files = protected_files.parent / "protected.txt"
+
+            #protected_files = open(pathlib.Path("madlib/protected.txt"), "r")
+            #protected_titles = protected_files.read()
+
+            protected_titles = pathlib.Path(protected_files).read_text()
+
             protected_titles = re.findall('\[(.*?)\]', protected_titles)
             all_titles = dump_dir()
             del_choice = all_titles[int(args[0]) - 1]['title']
