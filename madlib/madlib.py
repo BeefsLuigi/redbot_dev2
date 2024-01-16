@@ -16,7 +16,7 @@ class madlib(commands.Cog):
 
     @commands.group(invoke_without_command=True, require_var_positional=True)
     async def madlib(self, ctx):
-
+        """PISS"""
         names_list = dump_dir()
         page_list = []
         index = 1
