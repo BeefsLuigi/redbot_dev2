@@ -6,6 +6,7 @@ import re
 import os
 import pathlib
 import json
+import random
 
 from redbot.core import commands
 
@@ -28,16 +29,37 @@ class Recipe(commands.Cog):
         self.blank_entry = {'author': '', 'title': '', 'tags': [], 'body': ''}
 
 
-    @commands.group()
+    @commands.group(invoke_without_command=True)
     async def recipe(self, ctx):
-        """Remember that you are responsible for formatting your recipes."""
-     
+        """When involked by itself, pulls a random entry."""
+
+        try:
+            file = open(self.textpath, "r")
+            buffer = json.loads(file.read())
+            buffer['entry_count'] += 1
+            file.close
+        except:
+            await ctx.send("There was an error in opening file. Check directory.")
+            return
+        
+        try:
+            del buffer['entry_count']
+            entry = random.choice(list(buffer.keys()))
+            
+            output = buffer[entry]
+            user_obj = ctx.bot.get_user(output['author'])
+            user_name = user_obj.display_name
+
+            #add tag function later
+            await ctx.send(f"Index: {entry}\nAuthor: {user_name}\nTitle: {output['title']}{output['body']}")
+        except:
+            pass
 
     @recipe.group(name="new", autohelp=False)
     async def new_recipe(self, ctx, *, args):
         """Add recipe to collection.
         
-        Recipes have to be longer than 40 characters long. The title is grabbed by the bot by using everything before the first return or the first forty characters. Remember that you are responsible for formatting your recipes. If it sucks. delete it and use the new command to reupload."""
+        The title is grabbed by the bot by using everything before the first return or the first forty characters. Remember that you are responsible for formatting your recipes. If it sucks. delete it and use the new command to reupload."""
 
         #open file and load buffer
         try:
@@ -50,9 +72,9 @@ class Recipe(commands.Cog):
             return
         
         try:
-            if len(args) < 40:
-                await  ctx.send("I don't think this is long enough to be here...")
-                return
+            #if len(args) < 40:
+                #await  ctx.send("I don't think this is long enough to be here...")
+                #return
             linebreak_pos = args.find('\n')
             title = ''
             body = ''
@@ -82,7 +104,38 @@ class Recipe(commands.Cog):
         except:
             await ctx.send("There's been an error or user input is mangled.")
 
+    @recipe.group(name="backup", autohelp=False)
+    async def backup_file(self, ctx):
+        """Make a backup file."""
+        try:
+            file = open(self.textpath, "r")
+            buffer = json.loads(file.read())
+            file.close
+        except:
+            await ctx.send("There was an error in opening file. Check directory.")
+            return
+        try:
+            temp_file_path = pathlib.Path(pathlib.Path(__file__).resolve())
+            temp_file_path = temp_file_path.parent /"archive.txt"
+            temp_file = open(temp_file_path, "x")
+            output = ""
 
+            for entry in buffer:
+                if entry != 'entry_count':
+                    user_obj = ctx.bot.get_user(buffer[entry]['author'])
+                    user_name = user_obj.display_name
+                    output = f"Index: {entry}\nAuthor: {user_name}\nTitle: {buffer[entry]['title']}{buffer[entry]['body']}\n\n--------------------------------\n"
+                    temp_file.write(output)
+
+            temp_file.close()
+
+            await ctx.send(file=discord.File(temp_file_path))
+
+            os.remove(temp_file_path)
+        except:
+            pass
+
+        
 
     @recipe.group(name="open", autohelp=False)
     async def open_recipe(self, ctx, *, args):
